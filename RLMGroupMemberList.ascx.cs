@@ -35,7 +35,7 @@ namespace com.reallifeministries
     [Category( "Groups" )]
     [Description( "Lists all the members of the given group & sub-groups." )]
 
-    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
+    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter",false )]
     [LinkedPage( "Detail Page" )]
     [LinkedPage( "Person Profile Page", "Page used for viewing a person's profile. If set a view profile button will show for each group member.", false, "", "", 2, "PersonProfilePage" )]
     public partial class RLMGroupMemberList : RockBlock, ISecondaryBlock
