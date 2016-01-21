@@ -27,7 +27,7 @@
             </fieldset>
         </asp:Panel>
         <asp:Panel runat="server" ID="pnlResults" visible="false">
-            <Rock:Grid runat="server" ID="gResults" AllowSorting="true" cssClass="people-results" DataKeyNames="Id" >
+            <Rock:Grid runat="server" ID="gResults" AllowSorting="true" cssClass="people-results" DataKeyNames="Id" OnRowDataBound="gResults_RowDataBound" >
                 <Columns>
                     <asp:TemplateField>
                         <HeaderTemplate>
@@ -36,6 +36,9 @@
                         <ItemTemplate>
                             <asp:CheckBox runat="server" ID="chkSelect" />
                         </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="">
+                        <ItemTemplate></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField>
                         <ItemTemplate>
@@ -50,6 +53,7 @@
                             <%# String.Join(", ",((ICollection<Rock.Model.PhoneNumber>) Eval("PhoneNumbers")).AsEnumerable()) %>
                         </ItemTemplate>
                     </asp:TemplateField>
+                    
                 </Columns>
                 
             </Rock:Grid>
