@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -23,14 +24,17 @@ namespace com.reallifeministries.Attendance
     [Category( "Attendance" )]
     [Description( "All Church Attendance" )]
     [GroupField("Attending Group","Usually the attendance area/Checkin group",true)]
+    [CodeEditorField("CustomLavaColumn","Custom Lava to insert into each person row. {{Person.[attributeName]}}",CodeEditorMode.Lava,CodeEditorTheme.Rock,200,false)]
     [IntegerField("Schedule Id","The schedule connected with this Attendance",true)]
     public partial class AttendanceEntry : RockBlock
     {
         protected RockContext ctx;
+        private string _customLava;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             ctx = new RockContext();
+            _customLava = GetAttributeValue("CustomLavaColumn");
 
             if (!IsPostBack)
             {
@@ -181,6 +185,29 @@ namespace com.reallifeministries.Attendance
             clearResults();
 
             lblMessage.Text = "Attendance Recorded FOR: " + String.Join( ", ", people.Select(p => p.FullName ).ToArray() );
+        }
+
+
+        protected void gResults_RowDataBound( object sender, GridViewRowEventArgs e )
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow  && !String.IsNullOrEmpty(_customLava))
+            {
+                TableCell cell = e.Row.Cells[1];
+                var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
+
+                mergeFields.Add( "Person", e.Row.DataItem );
+
+                if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
+                {
+                    var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;
+                    if (currentPerson != null)
+                    {
+                        mergeFields.Add( "CurrentPerson", currentPerson );
+                    }
+                }
+
+                cell.Text = _customLava.ResolveMergeFields( mergeFields );
+            }
         }
 }
 }
