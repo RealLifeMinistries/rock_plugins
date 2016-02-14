@@ -319,11 +319,10 @@ namespace com.reallifeministries
                 var groups = new List<Group>();
                 groups.Add( _group );
 
-                if (tglSubGroups.Checked)
-                {
-                    var descendedGroups = groupService.GetAllDescendents( _group.Id ).ToList();
-                    groups.AddRange(descendedGroups);
-                }
+                
+                var descendedGroups = groupService.GetAllDescendents( _group.Id ).ToList();
+                groups.AddRange(descendedGroups);
+              
 
                 GroupMemberService gmserv = new GroupMemberService( rockContext );
                 var groupIds = groups.Select( a => a.Id ).ToList();
