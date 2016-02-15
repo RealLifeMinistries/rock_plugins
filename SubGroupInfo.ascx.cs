@@ -131,20 +131,22 @@ namespace com.reallifeministries
                     {
                         var subGroupsAndSubMembers = (
                             from g in subGroups
-                            let groupIds = (groupService.GetAllDescendents( g.Id ).Select( a => a.Id ).ToList().Concat( new List<int>() { g.Id } ))
+                            let groupIds = (groupService.GetAllDescendents(g.Id).Select(a => a.Id).ToList().Concat(new List<int>() { g.Id }))
                             select new
                             {
                                 Group = g,
-                                Members = rockContext.GroupMembers.Where( m => groupIds.Contains( m.GroupId ) )
-                                                .Where(m=>groupTypeIncludeGuids.Contains(m.Group.GroupType.Guid)).ToList()
+                                Members = rockContext.GroupMembers.Where(m => groupIds.Contains(m.GroupId))
+                                                .Where(m => groupTypeIncludeGuids.Contains(m.Group.GroupType.Guid)).ToList(),
+                                Count = groupService.GetAllDescendents(g.Id).Where(d => d.Groups.Count == 0).Count()
                             });
-
+                        
                         var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy( a => a.Group.Name ).Select( g => new
                         {
                             GroupId = g.Group.Id,
                             Group = g.Group,
+                            GroupCount = g.Count,
                             PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
-                            ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
+                            ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()                            
                         } ).ToList();
 
                         gSubGroups.DataSource = subGroupMemberCounts;
@@ -158,13 +160,15 @@ namespace com.reallifeministries
                             select new
                             {
                                 Group = g,
-                                Members = rockContext.GroupMembers.Where( m => groupIds.Contains( m.GroupId ) ).ToList()
+                                Members = rockContext.GroupMembers.Where( m => groupIds.Contains( m.GroupId ) ).ToList(),
+                                Count = groupService.GetAllDescendents(g.Id).Where(d => d.Groups.Count == 0).Count()
                             });
 
                         var subGroupMemberCounts = subGroupsAndSubMembers.OrderBy( a => a.Group.Name ).Select( g => new
                         {
                             GroupId = g.Group.Id,
                             Group = g.Group,
+                            GroupCount = g.Count,
                             PendingMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Pending ).Count(),
                             ActiveMembers = g.Members.Where( m => m.GroupMemberStatus == GroupMemberStatus.Active ).Count()
                         } ).ToList();

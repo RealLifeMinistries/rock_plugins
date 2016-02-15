@@ -19,11 +19,7 @@
                             OnRowSelected="gSubGroups_RowSelected" DataKeyNames="GroupId">
                             <Columns>
                                 <Rock:RockBoundField DataField="Group.Name" HeaderText="Name" />
-                                <asp:TemplateField HeaderText="Groups">
-                                    <ItemTemplate>
-                                        <i class="fa fa-info-circle" title="Coming Soon!"></i>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
+                                <Rock:RockBoundField DataField="GroupCount" HeaderText="Groups" />
                                 <Rock:RockBoundField DataField="ActiveMembers" HeaderText="Active" />
                                 <Rock:RockBoundField DataField="PendingMembers" HeaderText="Pending" />
                             </Columns>

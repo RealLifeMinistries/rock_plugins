@@ -35,7 +35,7 @@ namespace com.reallifeministries
     [Category( "Groups" )]
     [Description( "Lists all the members of the given group & sub-groups." )]
 
-    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter" )]
+    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter",false )]
     [LinkedPage( "Detail Page" )]
     [LinkedPage( "Person Profile Page", "Page used for viewing a person's profile. If set a view profile button will show for each group member.", false, "", "", 2, "PersonProfilePage" )]
     public partial class RLMGroupMemberList : RockBlock, ISecondaryBlock
@@ -319,11 +319,10 @@ namespace com.reallifeministries
                 var groups = new List<Group>();
                 groups.Add( _group );
 
-                if (tglSubGroups.Checked)
-                {
-                    var descendedGroups = groupService.GetAllDescendents( _group.Id ).ToList();
-                    groups.AddRange(descendedGroups);
-                }
+                
+                var descendedGroups = groupService.GetAllDescendents( _group.Id ).ToList();
+                groups.AddRange(descendedGroups);
+              
 
                 GroupMemberService gmserv = new GroupMemberService( rockContext );
                 var groupIds = groups.Select( a => a.Id ).ToList();
