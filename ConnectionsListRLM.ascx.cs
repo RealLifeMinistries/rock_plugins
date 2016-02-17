@@ -732,7 +732,7 @@ namespace com.reallifeministries
                     var results = (
                         from r in requests.ToList()
                         let homeLocation = r.PersonAlias.Person.GetHomeLocation( rockContext )
-                        let region = groupLocations.Where( gl =>
+                        let region = groupLocations.Where( gl => homeLocation.GeoPoint != null &&
                             homeLocation.GeoPoint.Intersects( gl.Location.GeoFence )
                         ).Select( gl => gl.Location ).FirstOrDefault()
 
