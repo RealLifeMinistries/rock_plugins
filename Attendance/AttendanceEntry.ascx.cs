@@ -51,8 +51,16 @@ namespace com.reallifeministries.Attendance
                 var person = new PersonService(ctx).Get(personId.AsInteger());
                 if (person != null){
                     tbName.Text = person.LastName + "," + person.FirstName;
+                    int selectedCampus = 0;
+                    var sessionCampus = Session["campus-id"];
+                    if (sessionCampus != null && Int32.TryParse(sessionCampus.ToString(), out selectedCampus))
+                    {
+                        ddlCampus.SelectedCampusId = selectedCampus;
+                    }
                     btnSearch_Click(null, null);
-                }                
+                }
+                
+                
             }
         }
 
@@ -85,7 +93,10 @@ namespace com.reallifeministries.Attendance
             lblMessage.Text = null;
 
             Session["attendance-attended-date"] = dpAttendanceDate.SelectedDate;
-
+            if (ddlCampus.SelectedCampusId != null)
+            {
+                Session["campus-id"] = ddlCampus.SelectedCampusId;
+            }
             var personService = new PersonService( ctx );
             pnlResults.Visible = true;
 
