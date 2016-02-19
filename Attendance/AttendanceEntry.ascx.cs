@@ -47,8 +47,12 @@ namespace com.reallifeministries.Attendance
                 } else {
                     dpAttendanceDate.SelectedDate = GetLastSunday();
                 }
-                
-                
+                string personId = PageParameter("PersonId");
+                var person = new PersonService(ctx).Get(personId.AsInteger());
+                if (person != null){
+                    tbName.Text = person.LastName + "," + person.FirstName;
+                    btnSearch_Click(null, null);
+                }                
             }
         }
 
@@ -194,9 +198,13 @@ namespace com.reallifeministries.Attendance
             {
                 TableCell cell = e.Row.Cells[1];
                 var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
-
+                
                 mergeFields.Add( "Person", e.Row.DataItem );
-
+                if (ddlCampus.SelectedCampusId.HasValue)
+                {
+                    var campus = (new CampusService(ctx).Get(ddlCampus.SelectedCampusId.Value));
+                    mergeFields.Add("Campus", campus);                    
+                }
                 if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
                 {
                     var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;

@@ -9,7 +9,7 @@
         <% } %>
         
 
-        <asp:Panel runat="server" ID="pnlSearch" >
+        <asp:Panel runat="server" ID="pnlSearch" DefaultButton="btnSearch" >
             <fieldset>
                 <legend>Attendance Info</legend>
                 <Rock:DatePicker runat="server"  id="dpAttendanceDate" Required="true" Label="Attended Date" />
