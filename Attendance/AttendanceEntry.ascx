@@ -13,7 +13,7 @@
             <fieldset>
                 <legend>Attendance Info</legend>
                 <Rock:DatePicker runat="server"  id="dpAttendanceDate" Required="true" Label="Attended Date" />
-                <Rock:CampusPicker ID="ddlCampus" runat="server" Label="Campus" />
+                <Rock:DataDropDownList ID="ddlWorshipService" SourceTypeName="Rock.Model.DefinedType, Rock" PropertyName="Name" runat="server" Label="Worship Service" />
             </fieldset>                      
             <fieldset>
                 <legend>Search For Person</legend>                   
@@ -68,7 +68,7 @@
     </ContentTemplate>
 </asp:UpdatePanel>
 <script>
-    jQuery(function ($) {
+    <%--jQuery(function ($) {
         
         var $sbCampusPicker = $(<%= ddlCampus.ClientID %>);
         var campusKey = 'attendance-campus_id';
@@ -79,7 +79,7 @@
         $sbCampusPicker.on('change', function (e) {
             sessionStorage.setItem(campusKey, $sbCampusPicker.val());
         });
-    });
+    });--%>
 
     function ToggleAllRows(chk) {
         var $gResults = $(".people-results");
