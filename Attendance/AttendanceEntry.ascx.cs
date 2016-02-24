@@ -96,7 +96,7 @@ namespace com.reallifeministries.Attendance
                     Text = value.Value,
                     WorshipService = worshipService.GetAttributeValue("WorshipService"),
                     Campus = worshipService.GetAttributeValue("Campus"),
-                    PrayerCategory = worshipService.GetAttributeValue("PrayerCategory")
+                    PrayerCategory = worshipService.GetAttributeValue("PrayerCategory"),
                 });                
             }            
             ddlWorshipService.DataSource =  campusWorshipServices;            
