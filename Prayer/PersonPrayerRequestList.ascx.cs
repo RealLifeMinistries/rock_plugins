@@ -277,9 +277,7 @@ namespace com.reallifeministries.Prayer
                     CategoryName = a.CategoryId.HasValue ? a.Category.Name : null,
                     EnteredDate = a.EnteredDateTime,
                     a.ExpirationDate,
-                    a.Text,
-                    a.FlagCount,
-                    a.IsApproved,
+                    a.Text,                                        
                     a.CategoryId,
                     CategoryParentCategoryId = a.CategoryId.HasValue ? a.Category.ParentCategoryId : null,
                     a.IsUrgent,
@@ -295,20 +293,7 @@ namespace com.reallifeministries.Prayer
                 prayerRequests = prayerRequests.Where( c => c.CategoryId == selectedPrayerCategoryID
                     || c.CategoryParentCategoryId == selectedPrayerCategoryID );
             }
-
-            // Filter by approved/unapproved
-            if ( ddlApprovedFilter.SelectedIndex > -1 )
-            {
-                if ( ddlApprovedFilter.SelectedValue == "unapproved" )
-                {
-                    prayerRequests = prayerRequests.Where( a => a.IsApproved == false || !a.IsApproved.HasValue );
-                }
-                else if ( ddlApprovedFilter.SelectedValue == "approved" )
-                {
-                    prayerRequests = prayerRequests.Where( a => a.IsApproved == true );
-                }
-            }
-
+            
             // Filter by urgent/non-urgent
             if ( ddlUrgentFilter.SelectedIndex > -1 )
             {
@@ -442,13 +427,7 @@ namespace com.reallifeministries.Prayer
                         prayerRequest.IsApproved = true;
                         prayerRequest.ApprovedByPersonAliasId = CurrentPersonAliasId;
                         prayerRequest.ApprovedOnDateTime = RockDateTime.Now;
-
-                        // reset the flag count only to zero ONLY if it had a value previously.
-                        if ( prayerRequest.FlagCount.HasValue && prayerRequest.FlagCount > 0 )
-                        {
-                            prayerRequest.FlagCount = 0;
-                        }
-
+                        
                         var expireDays = Convert.ToDouble( GetAttributeValue( "ExpireDays" ) );
                         prayerRequest.ExpirationDate = RockDateTime.Now.AddDays( expireDays );
                     }
