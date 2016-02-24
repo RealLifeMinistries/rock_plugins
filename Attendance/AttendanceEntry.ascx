@@ -68,19 +68,6 @@
     </ContentTemplate>
 </asp:UpdatePanel>
 <script>
-    <%--jQuery(function ($) {
-        
-        var $sbCampusPicker = $(<%= ddlCampus.ClientID %>);
-        var campusKey = 'attendance-campus_id';
-
-        if (!$sbCampusPicker.val()) {
-            $sbCampusPicker.val(sessionStorage.getItem(campusKey));
-        }
-        $sbCampusPicker.on('change', function (e) {
-            sessionStorage.setItem(campusKey, $sbCampusPicker.val());
-        });
-    });--%>
-
     function ToggleAllRows(chk) {
         var $gResults = $(".people-results");
         var $chk = $(chk)
