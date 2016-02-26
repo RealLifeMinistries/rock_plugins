@@ -14,9 +14,10 @@ using Rock.Attribute;
 using Rock.Constants;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
-using Rock.Web.Cache;
-using System.Drawing;
+using DotLiquid;
+using System.Runtime.Serialization;
 using System.Text;
+using Rock.Web.Cache;
 
 namespace com.reallifeministries.Attendance
 {
@@ -24,14 +25,14 @@ namespace com.reallifeministries.Attendance
     /// Attendence Entry
     /// </summary>
     [Category( "Attendance" )]
-    [Description( "All Church Attendance" )]
-    [GroupField("Attending Group","Usually the attendance area/Checkin group",true)]
+    [Description( "All Church Attendance" )]    
     [CodeEditorField("CustomLavaColumn","Custom Lava to insert into each person row. {{Person.[attributeName]}}",CodeEditorMode.Lava,CodeEditorTheme.Rock,200,false)]
     [IntegerField("Schedule Id","The schedule connected with this Attendance",true)]
     public partial class AttendanceEntry : RockBlock
     {
         protected RockContext ctx;
         private string _customLava;
+        protected List<CampusWorshipAttendance> campusWorshipAttendance;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -40,8 +41,8 @@ namespace com.reallifeministries.Attendance
 
             if (!IsPostBack)
             {
-                pnlResults.Visible = false;
-                BindCampusPicker();
+                pnlResults.Visible = false;                
+                BindWorshipServicePicker();
 
                 var lastAttendedDate = Session["attendance-attended-date"];
                 if(lastAttendedDate != null) {
@@ -52,16 +53,16 @@ namespace com.reallifeministries.Attendance
                 string personId = PageParameter("PersonId");
                 var person = new PersonService(ctx).Get(personId.AsInteger());
                 if (person != null){
-                    tbName.Text = person.LastName + "," + person.FirstName;
-                    int selectedCampus = 0;
-                    var sessionCampus = Session["campus-id"];
-                    if (sessionCampus != null && Int32.TryParse(sessionCampus.ToString(), out selectedCampus))
+                    tbName.Text = person.LastName + "," + person.FirstName;                    
+                    var selectedCampusWorshipAttendance = Session["selected-campus-worship-attendance"];
+                    if (selectedCampusWorshipAttendance != null )
                     {
-                        ddlCampus.SelectedCampusId = selectedCampus;
+                        ddlWorshipService.SelectedValue = selectedCampusWorshipAttendance.ToString();
                     }
                     btnSearch_Click(null, null);
-                }                
-
+                }
+                
+                
             }
         }
 
@@ -83,25 +84,35 @@ namespace com.reallifeministries.Attendance
             }
 
         }
-        protected void BindCampusPicker()
+        protected void BindWorshipServicePicker()
         {
-            ddlCampus.Campuses = CampusCache.All();
-        }       
+            var worshipServiceValues = new DefinedTypeService(ctx).Queryable().Where(t => t.Name == "Campus Worship Service").Select(d => d.DefinedValues);
+            campusWorshipAttendance = new List<CampusWorshipAttendance>();
+            foreach (var value in worshipServiceValues.FirstOrDefault())
+            {
+                value.LoadAttributes();
+                var worshipService = value.AttributeValues.Where(a => a.Key == "WorshipService").Select(v => v.Value).FirstOrDefault();                                
+                var campus = value.AttributeValues.Where(a => a.Key == "Campus").Select(v => v.Value).FirstOrDefault();
+                var prayerCat = value.AttributeValues.Where(a => a.Key == "PrayerCategory").Select(v => v.Value).FirstOrDefault();
+                campusWorshipAttendance.Add(new CampusWorshipAttendance
+                {
+                    Text = value.Value,
+                    WorshipService = worshipService.Value,
+                    Campus = campus.Value,
+                    PrayerCategory = prayerCat.Value
+                });                
+            }
+            ddlWorshipService.DataSource = campusWorshipAttendance;
+            Session["campus-worship-attendance"] = campusWorshipAttendance;
+            ddlWorshipService.DataBind();             
+
+        }
+
 
         protected void btnSearch_Click( object sender, EventArgs e )
         {
             lblMessage.Text = null;
-
-            Session["attendance-attended-date"] = dpAttendanceDate.SelectedDate;
-            if (ddlCampus.SelectedCampusId != null)
-            {
-                Session["campus-id"] = ddlCampus.SelectedCampusId;
-            }
-            var personService = new PersonService( ctx );
-            pnlResults.Visible = true;
-
-            gResults.Caption = "Search Results";
-
+            var personService = new PersonService(ctx);
             if (!String.IsNullOrEmpty(tbPhoneNumber.Text))
             {
                 gResults.DataSource = personService.GetByPhonePartial( tbPhoneNumber.Text ).ToList();
@@ -112,8 +123,14 @@ namespace com.reallifeministries.Attendance
             }
             else
             {
-                gResults.DataSource = ctx.People.ToList();
+                lblMessage.Text = "No Phone Number or Name was entered, please enter a Phone Number or Name";
+                return;
             }
+
+            Session["attendance-attended-date"] = dpAttendanceDate.SelectedDate;            
+            pnlResults.Visible = true;
+
+            gResults.Caption = "Search Results";
             gResults.DataBind();
         }
       
@@ -269,39 +286,43 @@ namespace com.reallifeministries.Attendance
                     } 
                 }
             }
-
-
-            var groupGuid = GetAttributeValue( "AttendingGroup" ).AsGuid();
-            var personService = new PersonService( ctx );
-            var attendanceService = new AttendanceService( ctx );
-            var groupService = new GroupService( ctx );
-
-            var people = personService.GetByIds( peopleIds );
-            var scheduleId = GetAttributeValue( "ScheduleId" ).AsIntegerOrNull();
-
+            var campusWorshipAttendance = Session["campus-worship-attendance"] as List<CampusWorshipAttendance>;
+            CampusWorshipAttendance selectedWorshipService = null;
+            if (campusWorshipAttendance != null)
+            {
+                selectedWorshipService = campusWorshipAttendance.Find(m => m.Text == ddlWorshipService.SelectedValue);                
+            }
+            Guid? groupGuid = null;
+            Guid? campusGuid = null;
+            if (selectedWorshipService != null)
+            {
+                groupGuid = selectedWorshipService.WorshipService.AsGuid();
+                campusGuid = selectedWorshipService.Campus.AsGuid();
+            }       
+            else
+            {
+                lblMessage.Text = "Could not record attendance, campus worship attendance not set";
+                return;
+            }     
+            var people = new PersonService(ctx).GetByIds( peopleIds );
+            
             foreach (Person person in people)
             {
-                Rock.Model.Attendance attendance = ctx.Attendances.Create();
-                attendance.PersonAlias = person.PrimaryAlias;
-                attendance.StartDateTime = (DateTime)dpAttendanceDate.SelectedDate;
-                attendance.Group = groupService.Get( groupGuid );
-                attendance.ScheduleId = scheduleId;               
-
-                var campus_id = ddlCampus.SelectedValue;
-                if (!String.IsNullOrEmpty( campus_id ))
+                new AttendanceService(ctx).Add(new Rock.Model.Attendance
                 {
-                    attendance.CampusId = Convert.ToInt32(campus_id);
-                }
-                
-                attendanceService.Add( attendance );
-            }
+                    PersonAlias = person.PrimaryAlias,
+                    StartDateTime = (DateTime)dpAttendanceDate.SelectedDate,
+                    Group = new GroupService(ctx).Get(groupGuid.Value),                   
+                    Campus = new CampusService(ctx).Get(campusGuid.Value),
+                });
+            }            
 
             ctx.SaveChanges();
 
             clearForm();
             clearResults();
 
-            lblMessage.Text = "Attendance Recorded FOR: " + String.Join( ", ", people.Select(p => p.FullName ).ToArray() );
+            lblMessage.Text = "Attendance Recorded FOR: " + String.Join( ", ", people.Select(p => p.FirstName + " " + p.LastName ).ToArray() );
         }
 
 
@@ -312,18 +333,18 @@ namespace com.reallifeministries.Attendance
                 TableCell cell = e.Row.Cells[1];
                 var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
                 var person = (Person)(e.Row.DataItem);
-                if (person.RecordStatusValue.Value == "Inactive") {
-                    foreach (TableCell c in e.Row.Cells)
-                    {
-                        c.ForeColor = Color.IndianRed;                        
-                    }
-                    
-                }
-                mergeFields.Add( "Person", person);
-                if (ddlCampus.SelectedCampusId.HasValue)
                 {
-                    var campus = (new CampusService(ctx).Get(ddlCampus.SelectedCampusId.Value));
-                    mergeFields.Add("Campus", campus);                    
+                    campusWorshipAttendance = Session["campus-worship-attendance"] as List<CampusWorshipAttendance>;
+                    if (campusWorshipAttendance != null)
+                    {
+                        var selectedWorshipService = campusWorshipAttendance.Find(m => m.Text == ddlWorshipService.SelectedValue);                        
+                        if (selectedWorshipService != null){
+                            Session["selected-campus-worship-attendance"] = ddlWorshipService.SelectedValue;
+                            mergeFields.Add("WorshipService", selectedWorshipService.WorshipService);
+                            mergeFields.Add("Campus", selectedWorshipService.Campus);
+                            mergeFields.Add("PrayerCategory", selectedWorshipService.PrayerCategory);
+                        }
+                    }
                 }
                 if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
                 {
@@ -337,5 +358,14 @@ namespace com.reallifeministries.Attendance
                 cell.Text = _customLava.ResolveMergeFields( mergeFields );
             }
         }
-}
+}    
+    public class CampusWorshipAttendance
+    {
+        public string Text { get; set; }
+        public string Campus { get; set; }
+        public string WorshipService { get; set; }
+        public string PrayerCategory { get; set; }
+
+        public override string ToString() { return Text; }        
+    }
 }
