@@ -7,7 +7,6 @@
             <i class="fa fa-info-circle"></i> <asp:label ID="lblMessage" runat="server"  />
         </p>
         <% } %>
-        
 
         <asp:Panel runat="server" ID="pnlSearch" DefaultButton="btnSearch" >
             <fieldset>
@@ -23,7 +22,6 @@
                     <Rock:BootstrapButton ID="btnSearch" runat="server" CssClass="btn btn-lg btn-primary" Text="<i class='fa fa-search'></i> Search" OnClick="btnSearch_Click" />
                     <Rock:BootstrapButton ID="btnClear" runat="server" CssClass="btn btn-default" Text="Clear" OnClick="btnClear_Click" />  
                 </p>
-                
             </fieldset>
         </asp:Panel>
         <asp:Panel runat="server" ID="pnlResults" visible="false">
@@ -47,26 +45,35 @@
                             </asp:LinkButton>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:BoundField DataField="FullNameReversed" HeaderText="Name" />
-                    <asp:TemplateField HeaderText="Phone Number(s)">
-                        <ItemTemplate>
-                            <%# String.Join(", ",((ICollection<Rock.Model.PhoneNumber>) Eval("PhoneNumbers")).AsEnumerable()) %>
+                    <asp:TemplateField HeaderText="Name">
+                        <ItemTemplate>                            
+                            <asp:HyperLink runat="server" Target="_blank" Text='<%# Eval("FullNameReversed") %>' NavigateUrl='<%# Eval("ID","~/Person/{0}") %>' ToolTip='<%# ShowToolTip((Int32)Eval("ID")) %>' />                            
                         </ItemTemplate>
                     </asp:TemplateField>
-                    
+                    <asp:TemplateField HeaderText="Address">
+                        <ItemTemplate><%#  GetAddress((Int32)Eval("ID")) %></ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Phone Number(s)">                        
+                        <ItemTemplate>                            
+                            <%# ShowPhoneNumbers((IEnumerable<Rock.Model.PhoneNumber>)Eval("PhoneNumbers")) %>
+                        </ItemTemplate>                             
+                    </asp:TemplateField>                                
+                    <asp:BoundField HeaderText="Email" DataField="Email"/>        
+                    <asp:TemplateField HeaderText="Record Status">
+                        <ItemTemplate>
+                            <%# Eval("RecordStatusValue.Value").ToString() %>
+                        </ItemTemplate>
+                    </asp:TemplateField>
                 </Columns>
                 
             </Rock:Grid>
             <p>
                 <Rock:BootstrapButton ID="btnRecord" runat="server" Text="<i class='fa fa-save'></i> Record Attendance" CssClass="btn btn-primary btn-lg" OnClick="btnRecord_Click" />
             </p>
-            
         </asp:Panel>
-
-
-        
     </ContentTemplate>
 </asp:UpdatePanel>
+
 <script>
     function ToggleAllRows(chk) {
         var $gResults = $(".people-results");
