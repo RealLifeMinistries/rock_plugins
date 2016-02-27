@@ -18,6 +18,7 @@ using DotLiquid;
 using System.Runtime.Serialization;
 using System.Text;
 using Rock.Web.Cache;
+using System.Drawing;
 
 namespace com.reallifeministries.Attendance
 {
@@ -331,21 +332,27 @@ namespace com.reallifeministries.Attendance
             if (e.Row.RowType == DataControlRowType.DataRow  && !String.IsNullOrEmpty(_customLava))
             {
                 TableCell cell = e.Row.Cells[1];
-                var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
                 var person = (Person)(e.Row.DataItem);
+                var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields(null);
+                if (person != null && person.RecordStatusValue.Value == "Inactive")
                 {
-                    campusWorshipAttendance = Session["campus-worship-attendance"] as List<CampusWorshipAttendance>;
-                    if (campusWorshipAttendance != null)
+                    foreach (TableCell c in e.Row.Cells)
                     {
-                        var selectedWorshipService = campusWorshipAttendance.Find(m => m.Text == ddlWorshipService.SelectedValue);                        
-                        if (selectedWorshipService != null){
-                            Session["selected-campus-worship-attendance"] = ddlWorshipService.SelectedValue;
-                            mergeFields.Add("WorshipService", selectedWorshipService.WorshipService);
-                            mergeFields.Add("Campus", selectedWorshipService.Campus);
-                            mergeFields.Add("PrayerCategory", selectedWorshipService.PrayerCategory);
-                        }
+                        c.ForeColor = Color.IndianRed;
+                    }
+                }                                
+                campusWorshipAttendance = Session["campus-worship-attendance"] as List<CampusWorshipAttendance>;
+                if (campusWorshipAttendance != null)
+                {
+                    var selectedWorshipService = campusWorshipAttendance.Find(m => m.Text == ddlWorshipService.SelectedValue);                        
+                    if (selectedWorshipService != null){
+                        Session["selected-campus-worship-attendance"] = ddlWorshipService.SelectedValue;
+                        mergeFields.Add("WorshipService", selectedWorshipService.WorshipService);
+                        mergeFields.Add("Campus", selectedWorshipService.Campus);
+                        mergeFields.Add("PrayerCategory", selectedWorshipService.PrayerCategory);
                     }
                 }
+                
                 if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
                 {
                     var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;
