@@ -754,7 +754,7 @@ namespace com.reallifeministries
                             RegionName = (region != null ? region.Name : "No Region"),
                             PersonCity = homeLocation != null ? homeLocation.City : "No Location Info",
                             PersonState = homeLocation != null ? homeLocation.State : "No Location Info",
-                            PhoneNumber = String.Join(", ",r.PersonAlias.Person.PhoneNumbers.Where(p => p.IsUnlisted != true).Select(p => p.NumberFormatted).ToList())
+                            PhoneNumber = String.Join(", ",r.PersonAlias.Person.PhoneNumbers.Where(p => p.IsUnlisted != true && !String.IsNullOrWhiteSpace(p.Number)).Select(p => p.NumberFormatted).ToList())
                         }).AsQueryable();
 
                     
