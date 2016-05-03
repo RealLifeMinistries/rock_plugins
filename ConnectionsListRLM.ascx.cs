@@ -732,7 +732,7 @@ namespace com.reallifeministries
                     var results = (
                         from r in requests.ToList()
                         let homeLocation = r.PersonAlias.Person.GetHomeLocation( rockContext )
-                        let region = groupLocations.Where( gl => homeLocation.GeoPoint != null &&
+                        let region = groupLocations.Where( gl => homeLocation != null && homeLocation.GeoPoint != null &&
                             homeLocation.GeoPoint.Intersects( gl.Location.GeoFence )
                         ).Select( gl => gl.Location ).FirstOrDefault()
 
@@ -752,9 +752,9 @@ namespace com.reallifeministries
                             StateLabel = FormatStateLabel( r.ConnectionState, r.FollowupDate ),
                             RegionId = (region != null ? region.Id : 0),
                             RegionName = (region != null ? region.Name : "No Region"),
-                            PersonCity = homeLocation.City,
-                            PersonState = homeLocation.State,
-                            PhoneNumber = String.Join(" ",r.PersonAlias.Person.PhoneNumbers.Where(p => p.IsUnlisted != false).Select(p => p.NumberFormatted).ToList())
+                            PersonCity = homeLocation != null ? homeLocation.City : "No Location Info",
+                            PersonState = homeLocation != null ? homeLocation.State : "No Location Info",
+                            PhoneNumber = String.Join(", ",r.PersonAlias.Person.PhoneNumbers.Where(p => p.IsUnlisted != true).Select(p => p.NumberFormatted).ToList())
                         }).AsQueryable();
 
                     
