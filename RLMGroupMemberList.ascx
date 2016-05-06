@@ -36,15 +36,8 @@
                                     <Rock:SelectField></Rock:SelectField>
                                     <asp:TemplateField HeaderText="Name" SortExpression="Person.LastName,Person.NickName">
                                         <ItemTemplate>
-                                            <%#Eval("Person.FullName") %>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                    <asp:TemplateField ItemStyle-CssClass="grid-columncommand" HeaderStyle-CssClass="grid-columncommand">
-                                        <ItemTemplate>
-                                            <asp:HyperLink runat="server" ID="lnkProfile">
-                                                <div class='btn btn-default'><i class='fa fa-user'></i></div>
-                                            </asp:HyperLink>
-                                        </ItemTemplate>
+                                            <asp:HyperLink runat="server" NavigateUrl='<%#Eval("Person.Id","~/Person/{0}") %>'><%#Eval("Person.FullName") %></asp:HyperLink>
+                                        </ItemTemplate>                                                                       
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Group" SortExpression="Group.Name">
                                         <ItemTemplate>

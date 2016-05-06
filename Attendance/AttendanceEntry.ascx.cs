@@ -349,10 +349,10 @@ namespace com.reallifeministries.Attendance
                         Session["selected-campus-worship-attendance"] = ddlWorshipService.SelectedValue;
                         mergeFields.Add("WorshipService", selectedWorshipService.WorshipService);
                         mergeFields.Add("Campus", selectedWorshipService.Campus);
-                        mergeFields.Add("PrayerCategory", selectedWorshipService.PrayerCategory);
+                        mergeFields.Add("PrayerCategory", selectedWorshipService.PrayerCategory);                        
                     }
                 }
-                
+                mergeFields.Add("Person", person);
                 if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
                 {
                     var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;

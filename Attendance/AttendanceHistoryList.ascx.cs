@@ -173,7 +173,7 @@ namespace com.reallifeministries.Attendance
             {
                 attendanceQuery = attendanceQuery.Where( a => a.PersonAlias.PersonId == _person.Id );
 
-                ddlGroups.DataSource = attendanceQuery.Select( a => a.Group ).Distinct().OrderBy( a => a.Name ).ToList();
+                ddlGroups.DataSource = attendanceQuery.Select( a => a.Group ).Where(g => g != null).Distinct().OrderBy( a => a.Name ).ToList();
                 ddlGroups.DataBind();
                 ddlGroups.Items.Insert( 0, Rock.Constants.All.ListItem );
                 ddlGroups.Visible = attendanceQuery.Select( a => a.Group ).Distinct().ToList().Any();
@@ -200,7 +200,7 @@ namespace com.reallifeministries.Attendance
 
 
                 var attendanceList = attendanceQuery.ToList();
-                var qry = attendanceList.AsQueryable()
+                var qry = attendanceList.AsQueryable().Where(a => a.Group != null)
                     .Select( a => new
                     {
                         Location = a.Location,
