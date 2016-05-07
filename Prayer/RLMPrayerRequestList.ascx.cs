@@ -204,7 +204,7 @@ namespace RockWeb.Blocks.Prayer
                     a.Id,                    
                     Person = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person : null,                    
                     PersonId = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.Id.ToString() : "Unknown",
-                    PersonName = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.FirstName + " " + a.RequestedByPersonAlias.Person.LastName : "Unknown",
+                    PersonName = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.FirstName + " " + a.RequestedByPersonAlias.Person.LastName : a.FirstName + " " + a.LastName,
                     CategoryName = a.CategoryId.HasValue ? a.Category.Name : null,                    
                     EnteredDate = a.EnteredDateTime,                    
                     a.Text,                    
