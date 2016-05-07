@@ -426,28 +426,18 @@ namespace com.reallifeministries
 
                 SortProperty sortProperty = gGroupMembers.SortProperty;
 
-                List<GroupMember> groupMembers = null;
+                IQueryable<GroupMember> groupMembers = null;
 
                 if ( sortProperty != null )
                 {
-                    groupMembers = qry.Sort( sortProperty ).ToList();
+                    groupMembers = qry.Sort( sortProperty );
                 }
                 else
                 {
-                    groupMembers = qry.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName ).ToList();
+                    groupMembers = qry.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName );
                 }
-                                                          
-                gGroupMembers.DataSource = groupMembers/*.Select( m => new
-                {
-                    m.Id,
-                    m.Guid,
-                    m.PersonId,
-                    m.Person,
-                    Group = m.Group.Name,
-                    Name = m.Person.NickName + " " + m.Person.LastName,
-                    GroupRole = m.GroupRole.Name,
-                    m.GroupMemberStatus
-                } )*/.ToList();
+
+                gGroupMembers.SetLinqDataSource(groupMembers);
 
                 gGroupMembers.DataBind();
             }

@@ -32,14 +32,13 @@ using System.Collections.Generic;
 
 namespace RockWeb.Blocks.Prayer
 {
-    [DisplayName( "Prayer Request List" )]
+    [DisplayName( "RLM Prayer Request List" )]
     [Category( "Prayer" )]
-    [Description( "Displays a list of prayer requests for the configured top-level group category." )]
+    [Description( "Custom RLM Block to display a list of prayer requests for the configured top-level group category." )]
 
     [SecurityAction( Authorization.APPROVE, "The roles and/or users that have access to approve prayer requests and comments." )]
 
-    [LinkedPage( "Detail Page", Order = 0 )]
-    [LinkedPage("Person Profile Page", "Page used for viewing a person's profile. If set a view profile button will show for each group member.", false, "", "", 2, "PersonProfilePage")]
+    [LinkedPage( "Detail Page", Order = 0 )]    
     public partial class PrayerRequestList : RockBlock
     {
         #region Fields
@@ -203,9 +202,9 @@ namespace RockWeb.Blocks.Prayer
                 new
                 {
                     a.Id,                    
-                    Person = a.RequestedByPersonAlias.Person,                    
-                    PersonId = a.RequestedByPersonAlias.Person.Id,
-                    PersonName = a.RequestedByPersonAlias.Person.FirstName + " " + a.RequestedByPersonAlias.Person.LastName,
+                    Person = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person : null,                    
+                    PersonId = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.Id.ToString() : "Unknown",
+                    PersonName = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.FirstName + " " + a.RequestedByPersonAlias.Person.LastName : "Unknown",
                     CategoryName = a.CategoryId.HasValue ? a.Category.Name : null,                    
                     EnteredDate = a.EnteredDateTime,                    
                     a.Text,                    
@@ -238,11 +237,11 @@ namespace RockWeb.Blocks.Prayer
 
             if ( sortProperty != null )
             {
-                gPrayerRequests.DataSource = prayerRequests.Sort( sortProperty ).ToList();
+                gPrayerRequests.SetLinqDataSource(prayerRequests.Sort( sortProperty ));
             }
             else
             {
-                gPrayerRequests.DataSource = prayerRequests.OrderByDescending( p => p.EnteredDate ).ThenByDescending( p => p.Id ).ToList();
+                gPrayerRequests.SetLinqDataSource(prayerRequests.OrderByDescending( p => p.EnteredDate ).ThenByDescending( p => p.Id ));
             }
 
             gPrayerRequests.EntityTypeId = EntityTypeCache.Read<PrayerRequest>().Id;
@@ -272,20 +271,25 @@ namespace RockWeb.Blocks.Prayer
         protected string ShowPhoneNumbers(IEnumerable<PhoneNumber> phoneNumbers)
         {
             var phones = string.Empty;
-            foreach (var number in phoneNumbers)
+            if (phoneNumbers != null)
             {
-                if (number.NumberTypeValue.Value == "Home" || number.NumberTypeValue.Value == "Mobile")
+                foreach (var number in phoneNumbers)
                 {
-                    if (!string.IsNullOrEmpty(number.Number))
+                    if (number.NumberTypeValue.Value == "Home" || number.NumberTypeValue.Value == "Mobile")
                     {
-                        phones += string.Format("{0} : {1}<br> ", number.NumberTypeValue.Value, number.NumberFormatted);
+                        if (!string.IsNullOrEmpty(number.Number))
+                        {
+                            phones += string.Format("{0} : {1}<br> ", number.NumberTypeValue.Value, number.NumberFormatted);
+                        }
                     }
                 }
-            }
+            }            
             return phones;
         }
         protected string ShowGroups(Person person)
         {
+            if (person == null)
+                return String.Empty;
             int[] groupTypes = { 25, 27, 34, 35 };
             GroupService gs = new GroupService(rockContext);
             var members = gs.Queryable().Select(g => g.Members.Where(gm => gm.PersonId == person.Id)).FirstOrDefault();
@@ -297,6 +301,9 @@ namespace RockWeb.Blocks.Prayer
         protected string ShowRegion(Person person)
         {
             string region = "No Region";
+            if (person == null)
+                return region;
+
             var groupLocations = rockContext.GroupLocations
                         .Where(gl => gl.Location.GeoFence != null ).ToList();
             var homeLocation = person.GetHomeLocation(rockContext);

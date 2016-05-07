@@ -779,7 +779,7 @@ namespace com.reallifeministries
                             .OrderBy( r => r.PersonName );
                     }
 
-                    gRequests.DataSource = results.ToList();
+                    gRequests.SetLinqDataSource(results);
                     gRequests.DataBind();
 
                     lOpportunityIcon.Text = string.Format( "<i class='{0}'></i>", opportunitySummary.IconCssClass );

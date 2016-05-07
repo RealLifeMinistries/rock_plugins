@@ -247,7 +247,7 @@ namespace com.reallifeministries.Attendance
                 var limit = GetAttributeValue( "Limit" ).AsInteger();
                 qry = qry.Take( limit );
 
-                gHistory.DataSource = qry.ToList();
+                gHistory.SetLinqDataSource(qry);
 
                 gHistory.DataBind();
             }

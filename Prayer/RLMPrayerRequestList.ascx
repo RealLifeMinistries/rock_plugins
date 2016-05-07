@@ -17,7 +17,7 @@
 
                         <Rock:ModalAlert ID="maGridWarning" runat="server" />
 
-                        <Rock:Grid ID="gPrayerRequests" runat="server" AllowSorting="true" RowItemText="request" OnRowSelected="gPrayerRequests_Edit" OnRowDataBound="gPrayerRequests_RowDataBound" >
+                        <Rock:Grid ID="gPrayerRequests" runat="server" AllowSorting="true" AllowPaging="true" RowItemText="request" OnRowSelected="gPrayerRequests_Edit" OnRowDataBound="gPrayerRequests_RowDataBound" >
                             <Columns>                             
                                 <asp:HyperLinkField DataTextField="PersonName" DataNavigateUrlFields="PersonId" SortExpression="PersonName" DataNavigateUrlFormatString="~/Person/{0}" HeaderText="Person" />                                   
                                 <asp:TemplateField HeaderText="Age" SortExpression="Age" >
@@ -25,24 +25,24 @@
                                     <%# Eval("Person.Age") %>
                                 </ItemTemplate>
                                 </asp:TemplateField>                                
-                                <asp:TemplateField HeaderText="Phone Number(s)" SortExpression="PhoneNumbers" >
+                                <asp:TemplateField HeaderText="Phone Number(s)" >
                                     <ItemTemplate>
                                     <%# ShowPhoneNumbers((IEnumerable<Rock.Model.PhoneNumber>)Eval("Person.PhoneNumbers")) %>
                                 </ItemTemplate>
                                 </asp:TemplateField> 
-                                <asp:TemplateField HeaderText="Groups" SortExpression="Groups" >
+                                <asp:TemplateField HeaderText="Groups">
                                     <ItemTemplate>
                                     <%# ShowGroups((Rock.Model.Person)Eval("Person")) %>
                                 </ItemTemplate>
                                 </asp:TemplateField>           
-                                <asp:TemplateField HeaderText="Region" SortExpression="Region" >
+                                <asp:TemplateField HeaderText="Region">
                                     <ItemTemplate>
                                     <%# ShowRegion((Rock.Model.Person)Eval("Person")) %>
                                 </ItemTemplate>
                                 </asp:TemplateField>                                                 
                                 <Rock:RockBoundField DataField="CategoryName" HeaderText="Category" SortExpression="CategoryName" />
                                 <Rock:DateField DataField="EnteredDate" HeaderText="Entered" SortExpression="EnteredDate"/>
-                                <Rock:RockBoundField DataField="Text" HeaderText="Request" SortExpression="Text" />                                
+                                <Rock:RockBoundField DataField="Text" HeaderText="Request"/>                                
                                 <Rock:DeleteField OnClick="gPrayerRequests_Delete"  />
                             </Columns>
                         </Rock:Grid>

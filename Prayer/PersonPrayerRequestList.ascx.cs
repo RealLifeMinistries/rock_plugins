@@ -368,11 +368,11 @@ namespace com.reallifeministries.Prayer
 
             if ( sortProperty != null )
             {
-                gPrayerRequests.DataSource = prayerRequests.Sort( sortProperty ).ToList();
+                gPrayerRequests.SetLinqDataSource(prayerRequests.Sort( sortProperty ));
             }
             else
             {
-                gPrayerRequests.DataSource = prayerRequests.OrderByDescending( p => p.EnteredDate ).ThenByDescending( p => p.Id ).ToList();
+                gPrayerRequests.SetLinqDataSource(prayerRequests.OrderByDescending(p => p.EnteredDate).ThenByDescending(p => p.Id));
             }
 
             gPrayerRequests.DataBind();
