@@ -157,11 +157,7 @@ namespace com.reallifeministries
                     {
                         e.Row.AddCssClass( "deceased" );
                         e.Row.ToolTip = "Deceased";
-                    }
-                    
-                    var linkControl = (HyperLink)e.Row.FindControl( "lnkProfile" );
-                    linkControl.NavigateUrl = LinkedPageUrl( "PersonProfilePage", new Dictionary<string, string>() { { "PersonId", groupMember.PersonId.ToString() } } );
-                    var navi = linkControl.NavigateUrl; 
+                    }                    
                 }
             }
         }
