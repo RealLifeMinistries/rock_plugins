@@ -202,9 +202,7 @@ namespace RockWeb.Blocks.Prayer
                 new
                 {
                     a.Id,                    
-                    Person = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person : null,                    
-                    PersonId = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.Id.ToString() : "Unknown",
-                    PersonName = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person.FirstName + " " + a.RequestedByPersonAlias.Person.LastName : a.FirstName + " " + a.LastName,
+                    Person = a.RequestedByPersonAlias != null ? a.RequestedByPersonAlias.Person : null,                                        
                     CategoryName = a.CategoryId.HasValue ? a.Category.Name : null,                    
                     EnteredDate = a.EnteredDateTime,                    
                     a.Text,                    
@@ -245,6 +243,7 @@ namespace RockWeb.Blocks.Prayer
             }
 
             gPrayerRequests.EntityTypeId = EntityTypeCache.Read<PrayerRequest>().Id;
+            gPrayerRequests.ExportSource = ExcelExportSource.ColumnOutput;
             gPrayerRequests.DataBind();
         }
 
