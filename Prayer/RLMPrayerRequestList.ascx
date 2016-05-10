@@ -36,7 +36,7 @@
                                 </ItemTemplate>
                                 </asp:TemplateField>           
                                 <asp:TemplateField HeaderText="Region">
-                                    <ItemTemplate>
+                                    <ItemTemplate>                                                                        
                                     <%# ShowRegion((Rock.Model.Person)Eval("Person")) %>
                                 </ItemTemplate>
                                 </asp:TemplateField>                                                 
@@ -49,9 +49,6 @@
                     </div>
                 </div>
             </div>
-
-            
-
         </asp:Panel>
     </ContentTemplate>
 </asp:UpdatePanel>

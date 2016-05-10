@@ -290,12 +290,18 @@ namespace RockWeb.Blocks.Prayer
         {
             if (person == null)
                 return String.Empty;
-            int[] groupTypes = { 25, 27, 34, 35 };
-            GroupService gs = new GroupService(rockContext);
-            var members = gs.Queryable().Select(g => g.Members.Where(gm => gm.PersonId == person.Id)).FirstOrDefault();
-            var groupNames = members.Where(g => groupTypes.Contains(g.Group.TypeId)).Select(s => s.Group.Name).ToList();
-            
-            return String.Join(",", groupNames);
+            int[] groupTypes = { 25, 27, 34 };            
+            GroupMemberService groupMemberService = new GroupMemberService(rockContext);
+            var qry = groupMemberService.Queryable("Person,GroupRole,Group", false)
+                .Where(gm => gm.PersonId == person.Id).OrderBy(g => g.Group.GroupType.Id);
+            var groupNames = qry.Where(g => groupTypes.Contains(g.Group.GroupType.Id)).Select(s => new
+            {
+                GroupName = s.Group.Name + " (" + s.GroupRole.Name + ")",
+                GroupTypeId = s.Group.GroupTypeId
+            }).ToList();
+            groupNames.OrderBy(g => g.GroupTypeId);
+
+            return String.Join(", ", groupNames.Select(s => s.GroupName));
         }
 
         protected string ShowRegion(Person person)
