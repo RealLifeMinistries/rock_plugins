@@ -313,8 +313,9 @@ namespace com.reallifeministries.Attendance
                 {
                     PersonAlias = person.PrimaryAlias,
                     StartDateTime = (DateTime)dpAttendanceDate.SelectedDate,
-                    Group = new GroupService(ctx).Get(groupGuid.Value),                   
+                    Group = new GroupService(ctx).Get(groupGuid.Value),
                     Campus = new CampusService(ctx).Get(campusGuid.Value),
+                    DidAttend = true
                 });
             }            
 
