@@ -27,43 +27,43 @@
         <asp:Panel runat="server" ID="pnlResults" visible="false">
             <Rock:Grid runat="server" ID="gResults" AllowSorting="true" cssClass="people-results" DataKeyNames="Id" OnRowDataBound="gResults_RowDataBound" >
                 <Columns>
-                    <asp:TemplateField>
+                    <Rock:RockTemplateField>
                         <HeaderTemplate>
                             <input type="checkbox" onclick="javascript:ToggleAllRows(this);"  />
                         </HeaderTemplate>
                         <ItemTemplate>
                             <asp:CheckBox runat="server" ID="chkSelect" />
                         </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="">
+                    </Rock:RockTemplateField>
+                    <Rock:RockTemplateField HeaderText="">
                         <ItemTemplate></ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField>
+                    </Rock:RockTemplateField>
+                    <Rock:RockTemplateField>
                         <ItemTemplate>
                             <asp:LinkButton runat="server" ID="btnFamily" OnClick="btnFamily_Click" CommandArgument='<%# Eval("ID") %>'>
                                 <i class="fa fa-group"></i>
                             </asp:LinkButton>
                         </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Name">
+                    </Rock:RockTemplateField>
+                    <Rock:RockTemplateField HeaderText="Name">
                         <ItemTemplate>                            
                             <asp:HyperLink runat="server" Target="_blank" Text='<%# Eval("FullNameReversed") %>' NavigateUrl='<%# Eval("ID","~/Person/{0}") %>' ToolTip='<%# ShowToolTip((Int32)Eval("ID")) %>' />                            
                         </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Address">
+                    </Rock:RockTemplateField>
+                    <Rock:RockTemplateField HeaderText="Address">
                         <ItemTemplate><%#  GetAddress((Int32)Eval("ID")) %></ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Phone Number(s)">                        
+                    </Rock:RockTemplateField>
+                    <Rock:RockTemplateField HeaderText="Phone Number(s)">                        
                         <ItemTemplate>                            
                             <%# ShowPhoneNumbers((IEnumerable<Rock.Model.PhoneNumber>)Eval("PhoneNumbers")) %>
                         </ItemTemplate>                             
-                    </asp:TemplateField>                                
+                    </Rock:RockTemplateField>                                
                     <asp:BoundField HeaderText="Email" DataField="Email"/>        
-                    <asp:TemplateField HeaderText="Record Status">
+                    <Rock:RockTemplateField HeaderText="Record Status">
                         <ItemTemplate>
                             <%# Eval("RecordStatusValue.Value").ToString() %>
                         </ItemTemplate>
-                    </asp:TemplateField>
+                    </Rock:RockTemplateField>
                 </Columns>
                 
             </Rock:Grid>

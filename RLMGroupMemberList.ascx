@@ -34,26 +34,22 @@
                                 OnRowSelected="gGroupMembers_Edit" OnRowDataBound="gGroupMembers_RowDataBound">
                                 <Columns>
                                     <Rock:SelectField></Rock:SelectField>
-                                    <asp:TemplateField HeaderText="Name" SortExpression="Person.LastName,Person.NickName">
-                                        <ItemTemplate>
-                                            <asp:HyperLink runat="server" NavigateUrl='<%#Eval("Person.Id","~/Person/{0}") %>'><%#Eval("Person.FullName") %></asp:HyperLink>
-                                        </ItemTemplate>                                                                       
-                                    </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Group" SortExpression="Group.Name">
+                                    <Rock:PersonField HeaderText="Name" SortExpression="Person.LastName, Person.NickName"/>
+                                    <Rock:RockTemplateField HeaderText="Group" SortExpression="Group.Name">
                                         <ItemTemplate>
                                             <%#Eval("Group.Name") %>
                                         </ItemTemplate>
-                                    </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Role" SortExpression="GroupRole.Name">
+                                    </Rock:RockTemplateField>
+                                    <Rock:RockTemplateField HeaderText="Role" SortExpression="GroupRole.Name">
                                         <ItemTemplate>
                                             <%#Eval("GroupRole.Name") %>
                                         </ItemTemplate>
-                                    </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Status" SortExpression="GroupMemberStatus">
+                                    </Rock:RockTemplateField>
+                                    <Rock:RockTemplateField HeaderText="Status" SortExpression="GroupMemberStatus">
                                         <ItemTemplate>
                                             <%#Eval("GroupMemberStatus") %>
                                         </ItemTemplate>
-                                    </asp:TemplateField>
+                                    </Rock:RockTemplateField>
                                 </Columns>
                             </Rock:Grid>
                         </div>
