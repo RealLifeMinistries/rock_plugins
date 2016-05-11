@@ -34,7 +34,7 @@
                                 OnRowSelected="gGroupMembers_Edit" OnRowDataBound="gGroupMembers_RowDataBound">
                                 <Columns>
                                     <Rock:SelectField></Rock:SelectField>
-                                    <Rock:PersonField HeaderText="Name" SortExpression="Person.LastName, Person.NickName"/>
+                                    <Rock:PersonField DataField="Person" HeaderText="Name" SortExpression="Person.LastName, Person.NickName"/>
                                     <Rock:RockTemplateField HeaderText="Group" SortExpression="Group.Name">
                                         <ItemTemplate>
                                             <%#Eval("Group.Name") %>
