@@ -34,7 +34,14 @@
                                 OnRowSelected="gGroupMembers_Edit" OnRowDataBound="gGroupMembers_RowDataBound">
                                 <Columns>
                                     <Rock:SelectField></Rock:SelectField>
-                                    <Rock:PersonField DataField="Person" HeaderText="Name" SortExpression="Person.LastName, Person.NickName"/>
+                                    <Rock:PersonField DataField="CurrentPerson" HeaderText="Name" SortExpression="Person.LastName, Person.NickName"/>
+                                    <asp:TemplateField ItemStyle-CssClass="grid-columncommand" HeaderStyle-CssClass="grid-columncommand">
+                                        <ItemTemplate>
+                                            <asp:HyperLink runat="server" ID="lnkProfile">
+                                                <div class='btn btn-default'><i class='fa fa-user'></i></div>
+                                            </asp:HyperLink>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                     <Rock:RockTemplateField HeaderText="Group" SortExpression="Group.Name">
                                         <ItemTemplate>
                                             <%#Eval("Group.Name") %>
