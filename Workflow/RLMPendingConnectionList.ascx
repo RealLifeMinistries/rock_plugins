@@ -20,7 +20,7 @@
                     <div class="panel-heading clearfix">
                         <h1 class="panel-title pull-left">
                             <i class="fa fa-users"></i>
-                            <Rock:RockLiteral runat="server" Text="Workflow Activities" />
+                            Connection Requests
                         </h1>
                     </div>
 
@@ -28,15 +28,20 @@
                         <Rock:ModalAlert ID="mdGridWarning" runat="server" />
 
                         <Rock:NotificationBox ID="nbRoleWarning" runat="server" NotificationBoxType="Warning" Title="No roles!" Visible="false" />
-
+                        
                         <div class="grid grid-panel">                            
-                            <Rock:Grid ID="gWorkflows" runat="server" DisplayType="Full" AllowPaging="true" AllowSorting="true" OnRowEditing="gWorkflows_Entry">
+                            <Rock:Grid ID="gWorkflows" runat="server" DisplayType="Full" AllowPaging="true" AllowSorting="true">
                                 <Columns>
-                                    <Rock:RockBoundField DataField="Name" HeaderText="Activity Name"/>
-                                    <Rock:RockBoundField DataField="WorkflowType.Name" HeaderText="Workflow Type"/>
-                                    <Rock:RockBoundField DataField="Description" HeaderText="Description" />
-                                    <Rock:DateTimeField DataField="ActivatedDateTime" HeaderText="Activated DateTime" />
-                                    <Rock:RockBoundField DataField="Status" HeaderText="Status" />                                                                        
+                                    <Rock:RockTemplateField HeaderText="Connection Pending Entry">
+                                        <ItemTemplate>                                                                                     
+                                            <asp:HyperLink runat="server" Target="_blank" Text='Connection Pending Entry' NavigateUrl='<%# String.Format("~/WorkflowEntry/{0}/{1}", Eval("WorkflowType.Id"), Eval("Workflow.Id")) %>' />                            
+                                        </ItemTemplate>
+                                    </Rock:RockTemplateField> 
+                                    <Rock:RockBoundField DataField="ConnectionRequest" HeaderText="ConnectionRequest" />
+                                    <Rock:RockBoundField DataField="ActivityName" HeaderText="Activity Name"/>
+                                    <Rock:RockBoundField DataField="WorkflowType.Name" HeaderText="Workflow Type"/>                                    
+                                    <Rock:DateTimeField DataField="ActivatedDateTime" HeaderText="Requested Time" />
+                                    <Rock:RockBoundField DataField="Status" HeaderText="Status" />                                                            
                                 </Columns>
                             </Rock:Grid>
                         </div>

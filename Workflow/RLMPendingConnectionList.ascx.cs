@@ -66,8 +66,7 @@ namespace com.reallifeministries
                 {
                     _canView = true;                    
                 }
-            }
-           
+            }            
         }
 
         /// <summary>
@@ -117,14 +116,32 @@ namespace com.reallifeministries
                 pnlWorkflowActivities.Visible = true;
                 
                 nbRoleWarning.Visible = false;                
-                gWorkflows.Visible = true;                
-
-                var qry = new WorkflowService(ctx).Queryable("WorkflowType")
+                gWorkflows.Visible = true;
+                var workflowService = new WorkflowService(ctx);
+                var qry = workflowService.Queryable("WorkflowType")
                         .Where(w =>
                             w.ActivatedDateTime.HasValue &&
                             !w.CompletedDateTime.HasValue && w.Activities.Where(a => a.AssignedGroupId == _group.Id).FirstOrDefault() != null).OrderByDescending(w => w.ActivatedDateTime);
-                var dataSource = qry.ToList();
-                gWorkflows.DataSource = dataSource;
+                var workflowList = qry.ToList();
+                List<PendingConnection> connectionList = new List<PendingConnection>();
+                foreach (var workflow in workflowList)
+                {
+                    PendingConnection pc = new PendingConnection();
+                    pc.Workflow = workflow;
+                    pc.WorkflowType = workflow.WorkflowType;
+                    pc.ActivityName = workflow.ActiveActivityNames;
+                    pc.Status = workflow.Status;
+                    pc.ActivatedDateTime = workflow.ActivatedDateTime.Value;
+                    workflow.LoadAttributes();
+                    string connRequest = String.Empty;
+                    var conReqAttr = workflow.AttributeValues.Where(a => a.Key == "ConnectionRequest").FirstOrDefault().Value;
+                    if (conReqAttr != null)
+                    {
+                        pc.ConnectionRequest = conReqAttr.ValueFormatted;
+                    }
+                    connectionList.Add(pc);
+                }
+                gWorkflows.DataSource = connectionList;
                 gWorkflows.DataBind();                
             }
             else
@@ -139,8 +156,22 @@ namespace com.reallifeministries
             //Dictionary<String, String> queryParams = new Dictionary<string, string>();
             //queryParams.Add()
             //NavigateToPage(pageGuid,)
+            
             Response.Redirect(String.Format("~/WorkflowEntry/{0}/{1}", e.RowKeyId, _group.Id), false);
             Context.ApplicationInstance.CompleteRequest();
+        }
+        /// <summary>
+        /// Handles the hyperlink
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="GridViewRowEventArgs" /> instance containing the event data.</param>
+        protected void gWorkflows_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+              
+            }
         }
         #endregion
 
@@ -156,5 +187,16 @@ namespace com.reallifeministries
         }
 
         #endregion
+
+        private class PendingConnection
+        {
+            public String ActivityName { get; set; }
+            public WorkflowType WorkflowType{ get; set; }
+            public DateTime ActivatedDateTime { get; set; }
+            public String ConnectionRequest { get; set; }
+            public String Status { get; set; }
+            public Workflow Workflow { get; set; }
+
+        }
     }
 }
