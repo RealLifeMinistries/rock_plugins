@@ -30,15 +30,9 @@
                         <Rock:NotificationBox ID="nbRoleWarning" runat="server" NotificationBoxType="Warning" Title="No roles!" Visible="false" />
                         
                         <div class="grid grid-panel">                            
-                            <Rock:Grid ID="gWorkflows" runat="server" DisplayType="Full" AllowPaging="true" AllowSorting="true">
-                                <Columns>
-                                    <Rock:RockTemplateField HeaderText="Connection Pending Entry">
-                                        <ItemTemplate>                                                                                     
-                                            <asp:HyperLink runat="server" Target="_blank" Text='Connection Pending Entry' NavigateUrl='<%# String.Format("~/WorkflowEntry/{0}/{1}", Eval("WorkflowType.Id"), Eval("Workflow.Id")) %>' />                            
-                                        </ItemTemplate>
-                                    </Rock:RockTemplateField> 
-                                    <Rock:RockBoundField DataField="ConnectionRequest" HeaderText="ConnectionRequest" />
-                                    <Rock:RockBoundField DataField="ActivityName" HeaderText="Activity Name"/>
+                            <Rock:Grid ID="gWorkflows" runat="server" OnRowSelected="gWorkflows_Edit">
+                                <Columns>                                    
+                                    <Rock:RockBoundField DataField="ConnectionRequest" HeaderText="Connection" />                                    
                                     <Rock:RockBoundField DataField="WorkflowType.Name" HeaderText="Workflow Type"/>                                    
                                     <Rock:DateTimeField DataField="ActivatedDateTime" HeaderText="Requested Time" />
                                     <Rock:RockBoundField DataField="Status" HeaderText="Status" />                                                            
