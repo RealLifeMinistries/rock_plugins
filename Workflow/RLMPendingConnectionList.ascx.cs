@@ -38,7 +38,6 @@ namespace com.reallifeministries
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init" /> event.
         /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs" /> object that contains the event data.</param>
         protected override void OnInit( EventArgs e )
         {
             base.OnInit( e );
@@ -130,8 +129,7 @@ namespace com.reallifeministries
                 List<PendingConnection> connectionList = new List<PendingConnection>();
                 foreach (var workflow in workflowList)
                 {
-                    PendingConnection pc = new PendingConnection();
-                    pc.Workflow = workflow;
+                    PendingConnection pc = new PendingConnection();                    
                     pc.WorkflowType = workflow.WorkflowType;
                     pc.ActivityName = workflow.ActiveActivityNames;
                     pc.Status = workflow.Status;
@@ -194,8 +192,6 @@ namespace com.reallifeministries
             public DateTime ActivatedDateTime { get; set; }
             public String ConnectionRequest { get; set; }
             public String Status { get; set; }
-            public Workflow Workflow { get; set; }
-
         }
     }
 }
