@@ -19,7 +19,8 @@ namespace com.reallifeministries
     [Category( "Connections" )]
     [Description( "Lists all the pending connections based on a Group and a Group Role" )]
 
-    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter",false )]    
+    [GroupField( "Group", "Either pick a specific group or choose <none> to have group be determined by the groupId page parameter",false )]
+    [LinkedPage("Entry Page", "Page used to enter form information for a workflow.")]
     public partial class RLMPendingConnectionList : RockBlock, ISecondaryBlock
     {
         #region Private Variables
@@ -40,7 +41,10 @@ namespace com.reallifeministries
         /// <param name="e">An <see cref="T:System.EventArgs" /> object that contains the event data.</param>
         protected override void OnInit( EventArgs e )
         {
-            base.OnInit( e );            
+            base.OnInit( e );
+            gWorkflows.DataKeyNames = new string[] { "Id" };
+            gWorkflows.Actions.ShowAdd = false;
+            gWorkflows.IsDeleteEnabled = false;
             // if this block has a specific GroupId set, use that, otherwise, determine it from the PageParameters
             Guid groupGuid = GetAttributeValue( "Group" ).AsGuid();
             int groupId = 0;
@@ -131,6 +135,7 @@ namespace com.reallifeministries
                     pc.WorkflowType = workflow.WorkflowType;
                     pc.ActivityName = workflow.ActiveActivityNames;
                     pc.Status = workflow.Status;
+                    pc.Id = workflow.Id;
                     pc.ActivatedDateTime = workflow.ActivatedDateTime.Value;
                     workflow.LoadAttributes();
                     string connRequest = String.Empty;
@@ -150,27 +155,20 @@ namespace com.reallifeministries
             }
         }
 
-        protected void gWorkflows_Entry(object sender, RowEventArgs e)
-        {
-            //var pageGuid = new PageService(ctx).Queryable().Where(p => p.InternalName == "WorkflowEntry").Select(p => p.Guid).FirstOrDefault();
-            //Dictionary<String, String> queryParams = new Dictionary<string, string>();
-            //queryParams.Add()
-            //NavigateToPage(pageGuid,)
-            
-            Response.Redirect(String.Format("~/WorkflowEntry/{0}/{1}", e.RowKeyId, _group.Id), false);
-            Context.ApplicationInstance.CompleteRequest();
-        }
         /// <summary>
-        /// Handles the hyperlink
+        /// Handles the Edit event of the gWorkflows control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="GridViewRowEventArgs" /> instance containing the event data.</param>
-        protected void gWorkflows_RowDataBound(object sender, GridViewRowEventArgs e)
-        {
-
-            if (e.Row.RowType == DataControlRowType.DataRow)
+        /// <param name="e">The <see cref="RowEventArgs" /> instance containing the event data.</param>
+        protected void gWorkflows_Edit(object sender, RowEventArgs e)
+        { 
+            var workflow = new WorkflowService(new RockContext()).Get(e.RowKeyId);
+            if (workflow != null)
             {
-              
+                var qryParam = new Dictionary<string, string>();
+                qryParam.Add("WorkflowId", workflow.Id.ToString());                
+                qryParam.Add("WorkflowTypeId", workflow.WorkflowTypeId.ToString());
+                NavigateToLinkedPage("EntryPage", qryParam);
             }
         }
         #endregion
@@ -190,6 +188,7 @@ namespace com.reallifeministries
 
         private class PendingConnection
         {
+            public int Id { get; set; }
             public String ActivityName { get; set; }
             public WorkflowType WorkflowType{ get; set; }
             public DateTime ActivatedDateTime { get; set; }
