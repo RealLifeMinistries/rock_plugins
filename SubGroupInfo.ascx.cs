@@ -150,6 +150,7 @@ namespace com.reallifeministries
                         } ).ToList();
 
                         gSubGroups.DataSource = subGroupMemberCounts;
+                        gSubGroups.ExportSource = ExcelExportSource.ColumnOutput;
                         gSubGroups.DataBind();
                     }
                     else
