@@ -36,6 +36,11 @@
                                 <Rock:RockBoundField DataField="CategoryName" HeaderText="Category" SortExpression="CategoryName" />
                                 <Rock:DateField DataField="EnteredDate" HeaderText="Entered" SortExpression="EnteredDate"/>
                                 <Rock:RockBoundField DataField="Text" HeaderText="Request"/>                                
+                                <Rock:RockTemplateField HeaderText="Address" ExcelExportBehavior="AlwaysInclude" Visible="false">
+                                    <ItemTemplate>
+                                        <%# ShowAddress((Rock.Model.Person)Eval("Person")) %>
+                                    </ItemTemplate>
+                                    </Rock:RockTemplateField>
                                 <Rock:DeleteField OnClick="gPrayerRequests_Delete"  />
                             </Columns>
                         </Rock:Grid>

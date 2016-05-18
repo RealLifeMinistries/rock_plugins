@@ -303,6 +303,17 @@ namespace RockWeb.Blocks.Prayer
             return String.Join(", ", groupNames.Select(s => s.GroupName));
         }
 
+        protected string ShowAddress(Person person)
+        {
+            if (person == null)
+                return String.Empty;
+            Location homeLocation = person.GetHomeLocation(rockContext);
+            if (homeLocation != null)
+                return homeLocation.FormattedAddress;
+            else
+                return String.Empty;
+        }
+
         protected string ShowRegion(Person person)
         {
             string region = "No Region";
