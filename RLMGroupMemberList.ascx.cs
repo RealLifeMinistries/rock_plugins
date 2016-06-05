@@ -434,7 +434,7 @@ namespace com.reallifeministries
                     groupMembers = qry.OrderBy( a => a.Person.LastName ).ThenBy( a => a.Person.FirstName );
                 }
 
-                gGroupMembers.SetLinqDataSource(groupMembers);
+                gGroupMembers.DataSource = groupMembers.DistinctBy(gm => gm.Person).ToList();
 
                 gGroupMembers.DataBind();
             }
@@ -442,6 +442,20 @@ namespace com.reallifeministries
             {
                 pnlGroupMembers.Visible = false;
             }
+        }
+
+        protected string GetGroupRoles(Person p, int groupId)
+        {
+            string groupRoles = "No Roles Found";
+            GroupMemberService groupMemberService = new GroupMemberService(new RockContext());
+            var qry = groupMemberService.Queryable("Person,GroupRole,Group", true)
+                .Where(m => groupId == m.GroupId && m.PersonId == p.Id);
+            var results = qry.Select(gr => gr.GroupRole).ToList();
+            if (results != null)
+            {
+                groupRoles = String.Join(", ", results);
+            }
+            return groupRoles;
         }
 
         /// <summary>

@@ -49,7 +49,7 @@
                                     </Rock:RockTemplateField>
                                     <Rock:RockTemplateField HeaderText="Role" SortExpression="GroupRole.Name">
                                         <ItemTemplate>
-                                            <%#Eval("GroupRole.Name") %>
+                                            <%#GetGroupRoles((Rock.Model.Person)Eval("Person"), (int)Eval("Group.Id")) %>
                                         </ItemTemplate>
                                     </Rock:RockTemplateField>
                                     <Rock:RockTemplateField HeaderText="Status" SortExpression="GroupMemberStatus">
