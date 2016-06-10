@@ -324,11 +324,18 @@ namespace com.reallifeministries.Attendance
                         Campus = new CampusService(ctx).Get(campusGuid.Value),
                         DidAttend = true
                     });
-                    lblMessage.Text += "Attendance Recorded For: " + person.FirstName + " " + person.LastName + Environment.NewLine;
+                    if (lblMessage.Text.Contains("Attendance Recorded For"))
+                    {
+                        lblMessage.Text += ", " + person.FirstName + " " + person.LastName;
+                    }
+                    else
+                    {
+                        lblMessage.Text += "Attendance Recorded For: " + person.FirstName + " " + person.LastName;
+                    }                    
                 }
                 else
                 {
-                    lblMessage.Text += "Attendance Already Exists for " + person.FirstName + " " + person.LastName + Environment.NewLine;
+                    lblMessage.Text += "Attendance Already Exists for " + person.FirstName + " " + person.LastName + "<BR>";
                 }              
             }            
 
