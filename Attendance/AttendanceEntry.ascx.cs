@@ -49,7 +49,7 @@ namespace com.reallifeministries.Attendance
                 if(lastAttendedDate != null) {
                     dpAttendanceDate.SelectedDate = (DateTime)lastAttendedDate;
                 } else {
-                    dpAttendanceDate.SelectedDate = GetLastSunday();
+                    dpAttendanceDate.SelectedDate = GetLastSunday(DateTime.Now);
                 }
                 string personId = PageParameter("PersonId");
                 var person = new PersonService(ctx).Get(personId.AsInteger());
@@ -67,11 +67,8 @@ namespace com.reallifeministries.Attendance
             }
         }
 
-        private DateTime GetLastSunday()
+        private DateTime GetLastSunday(DateTime oDate)
         {
-
-            DateTime oDate = DateTime.Now;
-
             DayOfWeek dow = DateTime.Now.DayOfWeek;
 
             if ((int)dow < 5)
@@ -309,22 +306,36 @@ namespace com.reallifeministries.Attendance
             
             foreach (Person person in people)
             {
-                new AttendanceService(ctx).Add(new Rock.Model.Attendance
+                var lastSunday = GetLastSunday((DateTime)dpAttendanceDate.SelectedDate);
+                var attendanceService = new AttendanceService(ctx);
+                var attendance = attendanceService.Queryable().Where(a => a.PersonAliasId == person.PrimaryAliasId
+                && a.SundayDate.Year == lastSunday.Year
+                && a.SundayDate.Month == lastSunday.Month
+                && a.SundayDate.Day == lastSunday.Day
+                && a.Group.Guid == groupGuid.Value
+                && a.Campus.Guid == campusGuid.Value).FirstOrDefault();
+                if (attendance == null)
                 {
-                    PersonAlias = person.PrimaryAlias,
-                    StartDateTime = (DateTime)dpAttendanceDate.SelectedDate,
-                    Group = new GroupService(ctx).Get(groupGuid.Value),
-                    Campus = new CampusService(ctx).Get(campusGuid.Value),
-                    DidAttend = true
-                });
+                    attendanceService.Add(new Rock.Model.Attendance
+                    {
+                        PersonAlias = person.PrimaryAlias,
+                        StartDateTime = (DateTime)dpAttendanceDate.SelectedDate,
+                        Group = new GroupService(ctx).Get(groupGuid.Value),
+                        Campus = new CampusService(ctx).Get(campusGuid.Value),
+                        DidAttend = true
+                    });
+                    lblMessage.Text += "Attendance Recorded For: " + person.FirstName + " " + person.LastName + Environment.NewLine;
+                }
+                else
+                {
+                    lblMessage.Text += "Attendance Already Exists for " + person.FirstName + " " + person.LastName + Environment.NewLine;
+                }              
             }            
 
             ctx.SaveChanges();
 
             clearForm();
-            clearResults();
-
-            lblMessage.Text = "Attendance Recorded FOR: " + String.Join( ", ", people.Select(p => p.FirstName + " " + p.LastName ).ToArray() );
+            clearResults();           
         }
 
 
