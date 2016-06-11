@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="AttendanceAnalytics.ascx.cs" Inherits="com.reallifeministries.Attendance.AttendanceAnalytics" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="GroupAttendanceAnalytics.ascx.cs" Inherits="com.reallifeministries.Attendance.AttendanceAnalytics" %>
 
 <asp:UpdatePanel ID="upnlContent" runat="server">
     <ContentTemplate>
