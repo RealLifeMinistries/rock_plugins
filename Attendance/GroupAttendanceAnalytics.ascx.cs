@@ -101,8 +101,7 @@ namespace com.reallifeministries.Attendance
                 getGroupId();
 
                 lSlidingDateRangeHelp.Text = SlidingDateRangePicker.GetHelpHtml( RockDateTime.Now );
-                
-                LoadDropDowns();
+                                
                 try
                 {
                     LoadSettingsFromUserPreferences();
@@ -153,25 +152,6 @@ namespace com.reallifeministries.Attendance
 
         #region Methods
 
-        /// <summary>
-        /// Loads the drop downs.
-        /// </summary>
-        public void LoadDropDowns()
-        {
-            clbCampuses.Items.Clear();
-            var noCampusListItem = new ListItem();
-            noCampusListItem.Text = "<span title='Include records that are not associated with a campus'>No Campus</span>";
-            noCampusListItem.Value = "null";
-            clbCampuses.Items.Add( noCampusListItem );
-            foreach (var campus in CampusCache.All().OrderBy(a => a.Name))
-            {
-                var listItem = new ListItem();
-                listItem.Text = campus.Name;
-                listItem.Value = campus.Id.ToString();
-                clbCampuses.Items.Add( listItem );
-            }            
-        }
-        
         /// <summary>
         /// Loads the chart and any visible grids
         /// </summary>
@@ -282,17 +262,28 @@ function(item) {
 
             dataSourceParams.AddOrReplace( "graphBy", hfGraphBy.Value.AsInteger() );
 
-            var selectedCampusValues = clbCampuses.SelectedValues;
+            var selectedGroupIds = GetSelectedGroupIds();
 
-            string campusIdsValue = selectedCampusValues.AsDelimited( "," );
-            dataSourceParams.AddOrReplace( "campusIds", campusIdsValue );
-
-            dataSourceParams.AddOrReplace("groupIds", getGroupId());           
+            if (selectedGroupIds.Any())
+            {
+                dataSourceParams.AddOrReplace("groupIds", selectedGroupIds.AsDelimited(","));
+            }
+            else
+            {
+                // set the value to 0 to indicate that no groups where selected (and so that Rest Endpoint doesn't 404)
+                dataSourceParams.AddOrReplace("groupIds", 0);
+            }
 
             SaveSettingsToUserPreferences();
 
-            lineChartDataSourceUrl += "?" + dataSourceParams.Select( s => string.Format( "{0}={1}", s.Key, s.Value ) ).ToList().AsDelimited( "&" );            
-
+            lineChartDataSourceUrl += "?" + dataSourceParams.Select( s => string.Format( "{0}={1}", s.Key, s.Value ) ).ToList().AsDelimited( "&" );
+            // if no Groups are selected show a warning since no data will show up
+            nbGroupsWarning.Visible = false;
+            if (!selectedGroupIds.Any())
+            {
+                nbGroupsWarning.Visible = true;
+                return;
+            }
             lcAttendance.DataSourceUrl = this.ResolveUrl( lineChartDataSourceUrl );
             bcAttendance.TooltipFormatter = lcAttendance.TooltipFormatter;
             bcAttendance.DataSourceUrl = this.ResolveUrl( lineChartDataSourceUrl );
@@ -321,11 +312,11 @@ function(item) {
             string keyPrefix = string.Format( "attendance-reporting-{0}-", this.BlockId );
 
             this.SetUserPreference( keyPrefix + "GroupId", getGroupId(), false );
-
+            var selectedGroupIds = GetSelectedGroupIds();
+            this.SetUserPreference(keyPrefix + "GroupIds", selectedGroupIds.AsDelimited(","), false);
             this.SetUserPreference( keyPrefix + "SlidingDateRange", drpSlidingDateRange.DelimitedValues, false );
             this.SetUserPreference( keyPrefix + "GroupBy", hfGroupBy.Value, false );
-            this.SetUserPreference( keyPrefix + "GraphBy", hfGraphBy.Value, false );
-            this.SetUserPreference( keyPrefix + "CampusIds", clbCampuses.SelectedValues.AsDelimited(","), false );
+            this.SetUserPreference( keyPrefix + "GraphBy", hfGraphBy.Value, false );                        
             this.SetUserPreference( keyPrefix + "DataView", dvpDataView.SelectedValue, false );
                         
             this.SetUserPreference( keyPrefix + "ShowBy", hfShowBy.Value, false );
@@ -388,24 +379,7 @@ function(item) {
 
             hfGroupBy.Value = this.GetUserPreference( keyPrefix + "GroupBy" );
             hfGraphBy.Value = this.GetUserPreference( keyPrefix + "GraphBy" );
-
-            var campusIdList = new List<string>();
-            string campusKey = keyPrefix + "CampusIds";
-            var sessionPreferences = RockPage.SessionUserPreferences();
-            if ( sessionPreferences.ContainsKey( campusKey ) )
-            {
-                campusIdList = sessionPreferences[campusKey].Split( ',' ).ToList();
-                clbCampuses.SetValues( campusIdList );
-            }
-            else
-            {
-                // if previous campus selection has never been made, default to showing all of them
-                foreach ( ListItem item in clbCampuses.Items )
-                {
-                    item.Selected = true;
-                }
-            }
-
+                        
             var groupIdList = this.GetUserPreference( keyPrefix + "GroupIds" ).Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries ).ToList();
 
             // if no groups are selected, default to showing all of them
@@ -526,20 +500,36 @@ function(item) {
         {
             var dateRange = SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( drpSlidingDateRange.DelimitedValues );
 
-            //string groupIds = GetSelectedGroupIds().AsDelimited( "," );
-
-            var selectedCampusIds = clbCampuses.SelectedValues;
-            string campusIds = selectedCampusIds.AsDelimited( "," );
-
+            string groupIds = GetSelectedGroupIds().AsDelimited( "," );
+            
             var chartData = new AttendanceService( _rockContext ).GetChartData(
                 hfGroupBy.Value.ConvertToEnumOrNull<ChartGroupBy>() ?? ChartGroupBy.Week,
                 hfGraphBy.Value.ConvertToEnumOrNull<AttendanceGraphBy>() ?? AttendanceGraphBy.Total,
                 dateRange.Start,
                 dateRange.End,
-                getGroupId(),
-                campusIds,
+                groupIds,
+                null,
                 dvpDataView.SelectedValueAsInt() );
             return chartData;
+        }
+
+        private List<String> GetSelectedGroupIds()
+        {
+            if (_groupId == 0)
+            {
+                getGroupId();
+            }
+            var groupIdList = new GroupService(_rockContext).GetAllDescendents(_groupId).Select(g => g.Id.ToString()).ToList();
+            groupIdList.Add(_groupId.ToString());
+
+            return groupIdList;
+        }
+        private List<int> GetGroupIds()
+        {            
+            var groupIdList = new GroupService(_rockContext).GetAllDescendents(_groupId).Select(g => g.Id).ToList();
+            groupIdList.Add(_groupId);
+
+            return groupIdList;
         }
 
         private List<DateTime> _possibleAttendances = null;
@@ -559,9 +549,9 @@ function(item) {
             var rockContext = new RockContext();
 
             // make a qryPersonAlias so that the generated SQL will be a "WHERE .. IN ()" instead of an OUTER JOIN (which is incredibly slow for this) 
-            var qryPersonAlias = new PersonAliasService( rockContext ).Queryable();
+            var qryPersonAlias = new PersonAliasService(rockContext).Queryable();
 
-            var qryAttendance = new AttendanceService( rockContext ).Queryable();
+            var qryAttendance = new AttendanceService(rockContext).Queryable();
 
             qryAttendance = qryAttendance.Where( a => a.DidAttend.HasValue && a.DidAttend.Value );
             getGroupId();
@@ -569,39 +559,17 @@ function(item) {
             var qryAllVisits = qryAttendance;
             if ( groupType != null )
             {
-                var childGroupTypeIds = new GroupTypeService( rockContext ).GetChildGroupTypes( _groupId ).Select( a => a.Id );
+                var childGroupTypeIds = new GroupTypeService(rockContext).GetChildGroupTypes(groupType.Id).Select( a => a.Id );
                 qryAllVisits = qryAttendance.Where( a => childGroupTypeIds.Any( b => b == a.Group.GroupTypeId ) );
+            }
+            var groupIdList = new List<int>();
+            string groupIds = GetSelectedGroupIds().AsDelimited(",");
+            if (!string.IsNullOrWhiteSpace(groupIds))
+            {
+                groupIdList = groupIds.Split(',').AsIntegerList();
+                qryAttendance = qryAttendance.Where(a => a.GroupId.HasValue && groupIdList.Contains(a.GroupId.Value));
             }            
-            var groupIdList = new List<int>();            
-            qryAttendance = qryAttendance.Where( a => a.GroupId.HasValue && _groupId == a.GroupId.Value );           
-
-            //// If campuses were included, filter attendances by those that have selected campuses
-            //// if 'null' is one of the campuses, treat that as a 'CampusId is Null'
-            var includeNullCampus = clbCampuses.SelectedValues.Any( a => a.Equals( "null", StringComparison.OrdinalIgnoreCase ) );
-            var campusIdList = clbCampuses.SelectedValues.AsIntegerList();
-
-            // remove 0 from the list, just in case it is there 
-            campusIdList.Remove( 0 );
-
-            if ( campusIdList.Any() )
-            {
-                if ( includeNullCampus )
-                {
-                    // show records that have a campusId in the campusIdsList + records that have a null campusId
-                    qryAttendance = qryAttendance.Where( a => ( a.CampusId.HasValue && campusIdList.Contains( a.CampusId.Value ) ) || !a.CampusId.HasValue );
-                }
-                else
-                {
-                    // only show records that have a campusId in the campusIdList
-                    qryAttendance = qryAttendance.Where( a => a.CampusId.HasValue && campusIdList.Contains( a.CampusId.Value ) );
-                }
-            }
-            else if ( includeNullCampus )
-            {
-                // 'null' was the only campusId in the campusIds parameter, so only show records that have a null CampusId
-                qryAttendance = qryAttendance.Where( a => !a.CampusId.HasValue );
-            }
-
+            
             // have the "Missed" query be the same as the qry before the Main date range is applied since it'll have a different date range
             var qryMissed = qryAttendance;
 
@@ -641,10 +609,10 @@ function(item) {
                 var attendeePersonIds = qryAttendance.Select( a => a.PersonAlias.PersonId );
 
                 // Get all the active members of the selected groups who have no attendance within selected date range and campus
-                qryByPersonWithSummary = new GroupMemberService( rockContext )
+                qryByPersonWithSummary = new GroupMemberService(rockContext)
                     .Queryable().AsNoTracking()
                     .Where( m => 
-                        groupIdList.Contains( m.GroupId ) &&
+                        GetGroupIds().Contains( m.GroupId ) &&
                         !attendeePersonIds.Contains( m.PersonId ) &&
                         m.GroupMemberStatus == GroupMemberStatus.Active )
                     .Select( m => new PersonWithSummary
@@ -658,7 +626,7 @@ function(item) {
             else
             {
                 var qryAttendanceWithSummaryDateTime = qryAttendance.GetAttendanceWithSummaryDateTime( groupBy );
-                var qryGroup = new GroupService( rockContext ).Queryable();
+                var qryGroup = new GroupService(rockContext).Queryable();
 
                 var qryJoinPerson = qryAttendance.Join(
                     qryPersonAlias,
@@ -779,7 +747,7 @@ function(item) {
             var dataViewId = dvpDataView.SelectedValueAsInt();
             if ( dataViewId.HasValue )
             {
-                var dataView = new DataViewService( _rockContext ).Get( dataViewId.Value );
+                var dataView = new DataViewService( rockContext ).Get( dataViewId.Value );
                 if ( dataView != null )
                 {
                     var errorMessages = new List<string>();
@@ -1236,86 +1204,7 @@ function(item) {
                 }
             }
         }
-
-        /// <summary>
-        /// Handles the ItemDataBound event of the rptGroupTypes control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RepeaterItemEventArgs"/> instance containing the event data.</param>
-        protected void rptGroupTypes_ItemDataBound( object sender, RepeaterItemEventArgs e )
-        {
-            if ( e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem )
-            {
-                var groupType = e.Item.DataItem as GroupType;
-
-                var liGroupTypeItem = new HtmlGenericContainer( "li", "rocktree-item rocktree-folder" );
-                liGroupTypeItem.ID = "liGroupTypeItem" + groupType.Id;
-                e.Item.Controls.Add( liGroupTypeItem );
-
-                AddGroupTypeControls( groupType, liGroupTypeItem );
-            }
-        }
-
-        // list of grouptype ids that have already been rendered (in case a group type has multiple parents )
-        private List<int> _addedGroupTypeIds;
-
-        /// <summary>
-        /// Adds the group type controls.
-        /// </summary>
-        /// <param name="groupType">Type of the group.</param>
-        /// <param name="pnlGroupTypes">The PNL group types.</param>
-        private void AddGroupTypeControls( GroupType groupType, HtmlGenericContainer liGroupTypeItem )
-        {
-            if ( !_addedGroupTypeIds.Contains( groupType.Id ) )
-            {
-                _addedGroupTypeIds.Add( groupType.Id );
-
-                if ( groupType.Groups.Any() )
-                {
-                    bool showGroupAncestry = GetAttributeValue( "ShowGroupAncestry" ).AsBoolean( true );
-
-                    var groupService = new GroupService( _rockContext );
-
-                    var cblGroupTypeGroups = new RockCheckBoxList { ID = "cblGroupTypeGroups" + groupType.Id };
-
-                    cblGroupTypeGroups.Label = groupType.Name;
-                    cblGroupTypeGroups.Items.Clear();
-
-                    foreach ( var group in groupType.Groups
-                        .Where( g => !g.ParentGroupId.HasValue )
-                        .OrderBy( a => a.Order )
-                        .ThenBy( a => a.Name )
-                        .ToList() )
-                    {
-                        AddGroupControls( group, cblGroupTypeGroups, groupService, showGroupAncestry );
-                    }
-
-                    liGroupTypeItem.Controls.Add( cblGroupTypeGroups );
-                }
-                else
-                {
-                    if ( groupType.ChildGroupTypes.Any() )
-                    {
-                        liGroupTypeItem.Controls.Add( new Label { Text = groupType.Name, ID = "lbl" + groupType.Name } );
-                    }
-                }
-
-                if ( groupType.ChildGroupTypes.Any() )
-                {
-                    var ulGroupTypeList = new HtmlGenericContainer( "ul", "rocktree-children" );
-
-                    liGroupTypeItem.Controls.Add( ulGroupTypeList );
-                    foreach ( var childGroupType in groupType.ChildGroupTypes.OrderBy( a => a.Order ).ThenBy( a => a.Name ) )
-                    {
-                        var liChildGroupTypeItem = new HtmlGenericContainer( "li", "rocktree-item rocktree-folder" );
-                        liChildGroupTypeItem.ID = "liGroupTypeItem" + childGroupType.Id;
-                        ulGroupTypeList.Controls.Add( liChildGroupTypeItem );
-                        AddGroupTypeControls( childGroupType, liChildGroupTypeItem );
-                    }
-                }
-            }
-        }
-
+                
         /// <summary>
         /// Adds the group controls.
         /// </summary>
