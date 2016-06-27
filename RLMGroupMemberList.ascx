@@ -42,6 +42,7 @@
                                             </asp:HyperLink>
                                         </ItemTemplate>
                                     </asp:TemplateField>
+                                    <Rock:PhoneNumbersField HeaderText="Phone Numbers" DataField="Person.PhoneNumbers" DisplayCountryCode="false" />
                                     <Rock:RockTemplateField HeaderText="Group" SortExpression="Group.Name">
                                         <ItemTemplate>
                                             <%#Eval("Group.Name") %>
