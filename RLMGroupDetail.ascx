@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="RLMGroupDetail.ascx.cs" Inherits="RockWeb.Blocks.Groups.GroupDetail" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="RLMGroupDetail.ascx.cs" Inherits="com.reallifeministries.RLMGroupDetail" %>
 
 <script type="text/javascript">
     function clearActiveDialog() {
@@ -21,7 +21,7 @@
                 <div class="panel-heading panel-follow clearfix">
                     <h1 class="panel-title pull-left">
                         <asp:Literal ID="lGroupIconHtml" runat="server" />
-                        <asp:Literal ID="lReadOnlyTitle" runat="server" />                        
+                        <asp:Literal ID="lReadOnlyTitle" runat="server" />                                                                        
                     </h1>
 
                     <div class="panel-labels"> 
@@ -59,6 +59,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <Rock:DataTextBox ID="tbDescription" runat="server" SourceTypeName="Rock.Model.Group, Rock" PropertyName="Description" TextMode="MultiLine" Rows="4" />
+                                <Rock:RockLiteral ID="lpGroupLocation" runat="server" Label="Meeting Details" Visible="false" />
                             </div>
                         </div>
 
@@ -67,7 +68,7 @@
                                 <div class="col-md-6">
                                     <Rock:DataDropDownList ID="ddlGroupType" runat="server" DataTextField="Name" DataValueField="Id" SourceTypeName="Rock.Model.GroupType, Rock" PropertyName="Name" Label="Group Type" AutoPostBack="true" OnSelectedIndexChanged="ddlGroupType_SelectedIndexChanged" Required="true" />
                                     <Rock:RockLiteral ID="lGroupType" runat="server" Label="Group Type" />
-                                    <Rock:GroupPicker ID="gpParentGroup" runat="server" Required="false" Label="Parent Group" OnSelectItem="ddlParentGroup_SelectedIndexChanged" />                                    
+                                    <Rock:GroupPicker ID="gpParentGroup" runat="server" Required="false" Label="Parent Group" OnSelectItem="ddlParentGroup_SelectedIndexChanged" />                                                                        
                                 </div>
                                 <div class="col-md-6">
                                     <Rock:DataDropDownList ID="ddlCampus" runat="server" DataTextField="Name" DataValueField="Id" SourceTypeName="Rock.Model.Campus, Rock" PropertyName="Name" Label="Campus" />

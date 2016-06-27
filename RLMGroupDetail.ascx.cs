@@ -35,7 +35,7 @@ using Rock.Web.UI;
 using Rock.Web.UI.Controls;
 using Attribute = Rock.Model.Attribute;
 
-namespace RockWeb.Blocks.Groups
+namespace com.reallifeministries
 {
     [DisplayName( "RLM Group Detail" )]
     [Category( "Groups" )]
@@ -226,7 +226,7 @@ namespace RockWeb.Blocks.Groups
 
             // this event gets fired after block settings are updated. it's nice to repaint the screen if these settings would alter it
             this.BlockUpdated += Block_BlockUpdated;
-            this.AddConfigurationUpdateTrigger( upnlRLMGroupDetail );
+            this.AddConfigurationUpdateTrigger(upnlGroupDetail);
         }
 
         /// <summary>
