@@ -344,15 +344,7 @@ namespace com.reallifeministries.Search
         {
             get
             {
-                if ( RecordTypeValueId.HasValue )
-                {
-                    var recordType = DefinedValueCache.Read( RecordTypeValueId.Value );
-                    if ( recordType != null )
-                    {
-                        return Person.GetPhotoUrl( this.PhotoId, this.Age, this.Gender, recordType.Guid );
-                    }
-                }
-                return Person.GetPhotoUrl( this.PhotoId, this.Age, this.Gender );
+                return Person.GetPersonPhotoUrl(this.Id);
             }
             private set { }
         }
