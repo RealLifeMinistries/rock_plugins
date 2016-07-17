@@ -57,6 +57,7 @@
                                 <Rock:RockBoundField DataField="CategoryName" HeaderText="Category" SortExpression="CategoryName" />
                                 <Rock:DateField DataField="EnteredDate" HeaderText="Entered" SortExpression="EnteredDate"/>
                                 <Rock:RockBoundField DataField="Text" HeaderText="Request" SortExpression="Text" />                                
+                                <Rock:RockBoundField DataField="Answer" HeaderText="Response" SortExpression="Answer" />                                
                                 <Rock:DeleteField OnClick="gPrayerRequests_Delete"  />
                             </Columns>
                         </Rock:Grid>
