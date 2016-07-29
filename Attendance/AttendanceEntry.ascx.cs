@@ -65,6 +65,7 @@ namespace com.reallifeministries.Attendance
                 
                 
             }
+            tbPhoneNumber.Focus();
         }
 
         private DateTime GetLastSunday(DateTime oDate)
@@ -129,7 +130,7 @@ namespace com.reallifeministries.Attendance
             pnlResults.Visible = true;
 
             gResults.Caption = "Search Results";
-            gResults.DataBind();
+            gResults.DataBind();           
         }
       
         protected void btnFamily_Click( object sender, EventArgs e )
@@ -157,6 +158,7 @@ namespace com.reallifeministries.Attendance
         {
             tbName.Text = null;
             tbPhoneNumber.Text = null;
+            tbPhoneNumber.Focus();
         }
 
         protected void clearResults()
