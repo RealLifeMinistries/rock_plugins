@@ -354,7 +354,7 @@ namespace com.reallifeministries.Attendance
             {
                 TableCell cell = e.Row.Cells[1];
                 var person = (Person)(e.Row.DataItem);
-                var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields(null);
+                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields(RockPage);
                 if (person != null && person.RecordStatusValue.Value == "Inactive")
                 {
                     foreach (TableCell c in e.Row.Cells)

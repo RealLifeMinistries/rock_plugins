@@ -25,7 +25,6 @@ namespace com.reallifeministries
     {
         #region Private Variables
 
-        private DefinedValueCache _inactiveStatus = null;
         private Group _group = null;        
         private bool _canView = false;
         private RockContext ctx = new RockContext();

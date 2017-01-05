@@ -30,8 +30,7 @@ namespace com.reallifeministries
         #region Private Variables
 
         private Group _group = null;
-        private bool _canView = false;
-        private string _groupTerm = null;
+        private bool _canView = false;        
 
         #endregion
 
