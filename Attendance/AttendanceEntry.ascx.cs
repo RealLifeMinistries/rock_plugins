@@ -374,15 +374,7 @@ namespace com.reallifeministries.Attendance
                     }
                 }
                 mergeFields.Add("Person", person);
-                if (HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ))
-                {
-                    var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;
-                    if (currentPerson != null)
-                    {
-                        mergeFields.Add( "CurrentPerson", currentPerson );
-                    }
-                }
-
+                
                 cell.Text = _customLava.ResolveMergeFields( mergeFields );
             }
         }
